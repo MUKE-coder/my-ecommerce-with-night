@@ -12,19 +12,10 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Category } from "@prisma/client";
 
-export default function Home() {
+export default function Home({ categories }: { categories: Category[] }) {
   // Sample data for categories and products
-  const categories = [
-    "Electronics",
-    "Clothing",
-    "Books",
-    "Home & Garden",
-    "Sports",
-    "Toys",
-    "Beauty",
-    "Automotive",
-  ];
 
   const products = [
     { id: 1, name: "Wireless Earbuds", price: 79.99, category: "Electronics" },
@@ -42,16 +33,21 @@ export default function Home() {
       <main className="container mx-auto px-4 py-8">
         {/* Categories section */}
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-4">Categories</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-semibold ">Categories</h2>
+            <Button asChild>
+              <Link href="/dashboard/categories/new">Add New Category</Link>
+            </Button>
+          </div>
           <ScrollArea className="w-full whitespace-nowrap rounded-md border">
             <div className="flex w-max space-x-4 p-4">
               {categories.map((category) => (
                 <Button
-                  key={category}
+                  key={category.id}
                   variant="outline"
-                  className="flex-shrink-0"
+                  className="flex-shrink-0 capitalize"
                 >
-                  {category}
+                  {category.title.toLowerCase()}
                 </Button>
               ))}
             </div>

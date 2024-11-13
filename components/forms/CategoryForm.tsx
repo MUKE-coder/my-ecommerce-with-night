@@ -1,7 +1,9 @@
 "use client";
 import { createCategory } from "@/actions/category";
-import React from "react";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 export type CategoryProps = {
   title: string;
   slug: string;
@@ -10,11 +12,33 @@ export default function CategoryForm() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<CategoryProps>();
+  const [catErr, setCatErr] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
   async function saveData(data: CategoryProps) {
     data.slug = data.title.toLowerCase().split(" ").join("-");
-    await createCategory(data);
+    setLoading(true);
+    const res = await createCategory(data);
+    setCatErr("");
+
+    if (res.status === 200) {
+      console.log("Everything was Ok");
+      console.log(res);
+      setLoading(false);
+      reset();
+      toast.success("Category Created successfully");
+      router.push("/");
+      setCatErr("");
+      // Toast the message
+    } else {
+      setCatErr(res.error ?? "");
+      toast.error(res.error);
+      setLoading(false);
+      return;
+    }
   }
   return (
     <div className="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
@@ -39,13 +63,15 @@ export default function CategoryForm() {
           {errors && errors.title && (
             <p className="text-red-500">Title is required</p>
           )}
+          {catErr && <p className="text-red-500">{catErr}</p>}
         </div>
 
         <button
           type="submit"
+          disabled={loading}
           className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
-          Create Category
+          {loading ? "Creating please wait..." : "Create Category"}
         </button>
       </form>
     </div>
